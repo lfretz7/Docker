@@ -1,17 +1,11 @@
-Ubuntu/Docker mit Apache
-------------------------
+OSS Ticket
+==========
 
 ### Übersicht 
 
     +---------------------------------------------------------------+
-    !                                                               !	
-    !    +-------------------------+                                !
-    !    ! Web-Server              !                                !       
-    !    ! Port: 80                !                                !       
-    !    ! Volume: /var/www/html   !                                !       
-    !    +-------------------------+                                !
-    !                                                               !	
-    ! Container                                                     !	
+    ! Container: OSS Ticket                                         !	
+    ! Container: MySQL                                              !	
     +---------------------------------------------------------------+
     ! Container-Engine: Docker                                      !	
     +---------------------------------------------------------------+
@@ -23,28 +17,38 @@ Ubuntu/Docker mit Apache
     +---------------------------------------------------------------+
     ! Notebook - Schulnetz 10.x.x.x                                 !                 
     +---------------------------------------------------------------+
-	
+
 ### Beschreibung
 
-Ubuntu/Docker mit Apache Container und Daten (index.html) im HOME Verzeichnis unter web.
+[osTicket](http://osticket.com/) ist ein Open-Source-Support-Ticket-System. 
 
-Docker Container builden:
+Es leitet Anfragen, die per E-Mail, Webformularen und Telefonanrufen erstellt wurden, nahtlos in eine einfache, benutzerfreundliche webbasierte Kunden-Support-Plattform für mehrere Benutzer um.
 
-	cd /vagrant/apache
-	docker build -t apache .
+**Starten:**
 
-Docker Container starten:
-
-	docker run --rm -d -p 8080:80 -v `pwd`/web:/var/www/html --name apache apache
-
-Funktionsfähigkeit überprüfen Host -> Docker Container
-
-	curl http://localhost:8080
+	cd services/ossticket
+	vagrant up
 	
-Es muss der Inhalt von web/index.html angezeigt werden.
 
-**Testen**
+**User Interface:**
 
-`web/index.html` Datei editieren und mittels `curl` oder Browser testen.
+[http://localhost:8080/scp/](http://localhost:8080/scp/)
+	
+* username: ostadmin
+* password: Admin1
+	
+### Docker Repositories
 
+* [OSS Ticket](https://hub.docker.com/r/campbellsoftwaresolutions/osticket/)
+* [Offizielles MySQL Image](https://hub.docker.com/_/mysql/) 
 
+### Docker Befehlszeile
+
+Im `Vagrantfile` werden folgende Befehle ausgeführt:
+
+	docker run -d --name osticket_mysql -e MYSQL_ROOT_PASSWORD=secret -e MYSQL_USER=osticket \
+				-e MYSQL_PASSWORD=secret -e MYSQL_DATABASE=osticket --restart=always mysql
+
+	docker run -d --name osticket --link osticket_mysql:mysql -p 8080:80 --restart=always \
+				campbellsoftwaresolutions/osticket
+								
